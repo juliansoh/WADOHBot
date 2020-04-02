@@ -43,7 +43,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text($"Hi, I’m the DOH chatbot and I’m new. Thank you for your patience as we develop this new service. If I am not able to answer your question, or if you find a problem with my system that you’d like to report, please send an email to DOH.information@doh.wa.gov."), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.WelcomeMessage), cancellationToken);
             }
         }
         }
