@@ -33,9 +33,44 @@ namespace Microsoft.BotBuilderSamples.Bots
             await UserState.SaveChangesAsync(turnContext, false, cancellationToken);
         }
 
-        protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken) =>
-            // Run the Dialog with the new message Activity.
-            await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
+        protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        {
+            // Extract the text from the message activity the user sent.
+            var text = turnContext.Activity.Text.ToLower();
+
+            //Check to see if the user just responded to a feedback.
+            switch(text)
+            {
+                //Visitor answered "No"
+                case "no":
+                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedback), cancellationToken);
+                    await SendSuggestedActionsAsync(turnContext, cancellationToken);
+                    break;
+
+                case "yes":
+                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedback), cancellationToken);
+                    await SendSuggestedActionsAsync(turnContext, cancellationToken);
+                    break;
+
+                case "bye":
+                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.SayGoodbye), cancellationToken);
+                    break;
+
+                case "goodbye":
+                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.SayGoodbye), cancellationToken);
+                    break;
+
+                default:
+                    // Run the Dialog with the new message Activity through QnAMaker
+                    await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
+                    await SendAskForFeedbackAsync(turnContext, cancellationToken);
+                    break;
+            }
+
+
+
+
+        }
        
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
@@ -61,6 +96,21 @@ namespace Microsoft.BotBuilderSamples.Bots
                     new CardAction() { Title = "What is Covid-19", Type = ActionTypes.ImBack, Value = "What is Covid-19" },
                     new CardAction() { Title = "Symptoms of Covid-19", Type = ActionTypes.ImBack, Value = "Symptoms of Covid-19" },
                     new CardAction() { Title = "How does Covid-19 spread", Type = ActionTypes.ImBack, Value = "How does Covid-19 spread" },
+                },
+            };
+            await turnContext.SendActivityAsync(reply, cancellationToken);
+        }
+
+        private static async Task SendAskForFeedbackAsync(ITurnContext turnContext, CancellationToken cancellationToken)
+        {
+            var reply = MessageFactory.Text("Did this answer your question?");
+
+            reply.SuggestedActions = new SuggestedActions()
+            {
+                Actions = new List<CardAction>()
+                {
+                    new CardAction() { Title = "Yes", Type = ActionTypes.ImBack, Value = "Yes" },
+                    new CardAction() { Title = "No", Type = ActionTypes.ImBack, Value = "No" },
                 },
             };
             await turnContext.SendActivityAsync(reply, cancellationToken);
