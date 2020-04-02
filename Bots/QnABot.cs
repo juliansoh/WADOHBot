@@ -43,12 +43,12 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 //Visitor answered "No"
                 case "no":
-                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedback), cancellationToken);
-                    await SendSuggestedActionsAsync(turnContext, cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedbackNo), cancellationToken);
+                    await SendAskForFollowUpAsync(turnContext, cancellationToken);
                     break;
 
                 case "yes":
-                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedback), cancellationToken);
+                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedbackYes), cancellationToken);
                     await SendSuggestedActionsAsync(turnContext, cancellationToken);
                     break;
 
@@ -60,15 +60,20 @@ namespace Microsoft.BotBuilderSamples.Bots
                     await turnContext.SendActivityAsync(MessageFactory.Text(Constants.SayGoodbye), cancellationToken);
                     break;
 
+                case "follow-up":
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"Follow-up requested"), cancellationToken);
+                    break;
+
+                case "no follow-up":
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"NO follow-up requested"), cancellationToken);
+                    break;
+
                 default:
                     // Run the Dialog with the new message Activity through QnAMaker
                     await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
                     await SendAskForFeedbackAsync(turnContext, cancellationToken);
                     break;
             }
-
-
-
 
         }
        
@@ -87,7 +92,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
         private static async Task SendSuggestedActionsAsync(ITurnContext turnContext, CancellationToken cancellationToken)
         {
-            var reply = MessageFactory.Text("Type you question or pick one of these most frequently asked questions.");
+            var reply = MessageFactory.Text(Constants.Instructions);
 
             reply.SuggestedActions = new SuggestedActions()
             {
@@ -111,6 +116,21 @@ namespace Microsoft.BotBuilderSamples.Bots
                 {
                     new CardAction() { Title = "Yes", Type = ActionTypes.ImBack, Value = "Yes" },
                     new CardAction() { Title = "No", Type = ActionTypes.ImBack, Value = "No" },
+                },
+            };
+            await turnContext.SendActivityAsync(reply, cancellationToken);
+        }
+
+        private static async Task SendAskForFollowUpAsync(ITurnContext turnContext, CancellationToken cancellationToken)
+        {
+            var reply = MessageFactory.Text("Do you want us to follow-up with you via email?");
+
+            reply.SuggestedActions = new SuggestedActions()
+            {
+                Actions = new List<CardAction>()
+                {
+                    new CardAction() { Title = "Yes, follow-up", Type = ActionTypes.ImBack, Value = "Follow-up" },
+                    new CardAction() { Title = "No, just fix it", Type = ActionTypes.ImBack, Value = "No Follow-up" },
                 },
             };
             await turnContext.SendActivityAsync(reply, cancellationToken);
