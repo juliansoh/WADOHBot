@@ -16,6 +16,8 @@ namespace Microsoft.BotBuilderSamples.Bots
         protected readonly BotState ConversationState;
         protected readonly Microsoft.Bot.Builder.Dialogs.Dialog Dialog;
         protected readonly BotState UserState;
+        public string QuestionAsked;
+        public string AnswerProvided;
 
         public QnABot(ConversationState conversationState, UserState userState, T dialog)
         {
@@ -38,13 +40,20 @@ namespace Microsoft.BotBuilderSamples.Bots
             // Extract the text from the message activity the user sent.
             var text = turnContext.Activity.Text.ToLower();
 
-            //Check to see if the user just responded to a feedback.
+            //Check to see if the user just responded to a feedback, said bye, or anything that we may not send to QnAMaker. If no
+            //conditions met, then assume it's a question destined for the QnAMaker channel.
             switch(text)
             {
                 //Visitor answered "No"
                 case "no":
                     await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedbackNo), cancellationToken);
-                    await SendAskForFollowUpAsync(turnContext, cancellationToken);
+                    //Uncomment the next line if you want to activate option to have customer request for follow-up via email
+                    //await SendAskForFollowUpAsync(turnContext, cancellationToken);
+
+
+
+                    //The next line starts the conversation again with options and instructions.
+                    await SendSuggestedActionsAsync(turnContext, cancellationToken);
                     break;
 
                 case "yes":
@@ -71,6 +80,9 @@ namespace Microsoft.BotBuilderSamples.Bots
                 default:
                     // Run the Dialog with the new message Activity through QnAMaker
                     await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
+                    //Capture the question that was sent to QnAMaker
+                    QuestionAsked = turnContext.Activity.Text;
+                    AnswerProvided = turnContext.Activity.ChannelData;
                     await SendAskForFeedbackAsync(turnContext, cancellationToken);
                     break;
             }
