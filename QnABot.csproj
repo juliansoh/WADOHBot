@@ -4,9 +4,12 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
     <UserSecretsId>7e9cc97e-50d0-436e-8c72-a08b712b4ebf</UserSecretsId>
+    <ApplicationInsightsResourceId>/subscriptions/8d48e225-0906-403f-aad7-3377fe73d5d2/resourcegroups/rg-BotDemo/providers/microsoft.insights/components/Covid-BotDemo4uk6tb</ApplicationInsightsResourceId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.13.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.12.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.Bot.Builder.AI.QnA" Version="4.7.0" />
     <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.7.0" />
@@ -18,6 +21,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+    <ItemGroup>
+      <WCFMetadata Include="Connected Services" />
+    </ItemGroup>
 
   <Import Project="PostDeployScripts\IncludeSources.targets" Condition="Exists('PostDeployScripts\IncludeSources.targets')" />
   <Import Project="..\PostDeployScripts\IncludeSources.targets" Condition="Exists('..\PostDeployScripts\IncludeSources.targets')" />

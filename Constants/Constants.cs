@@ -12,5 +12,6 @@ namespace Microsoft.BotBuilderSamples.Bots
         public const string AckFeedbackYes = "Thank you! I am glad I was able to help.";
         public const string SayGoodbye = "Thank you for visiting DOH online and using me. I hope I was able to help you.";
         public const string Instructions = "Type your question or pick one of these most frequently asked questions.";
+        public const string ApplicationInsightsKey = "8bbf0d1b-f4d6-400c-9430-7c8f2e165e83";
     }
 }

@@ -8,6 +8,9 @@ using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Logging;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.DataContracts;
 
 namespace Microsoft.BotBuilderSamples.Bots
 {
@@ -16,9 +19,10 @@ namespace Microsoft.BotBuilderSamples.Bots
         protected readonly BotState ConversationState;
         protected readonly Microsoft.Bot.Builder.Dialogs.Dialog Dialog;
         protected readonly BotState UserState;
-        public string QuestionAsked;
-        public string AnswerProvided;
-
+        public static string QuestionAsked;
+        public static string Email;
+        //public string AnswerProvided;
+        
         public QnABot(ConversationState conversationState, UserState userState, T dialog)
         {
             ConversationState = conversationState;
@@ -46,11 +50,17 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 //Visitor answered "No"
                 case "no":
+                    //Respond to the visitor that we acknowledge their "No" feedback
                     await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedbackNo), cancellationToken);
+
                     //Uncomment the next line if you want to activate option to have customer request for follow-up via email
                     //await SendAskForFollowUpAsync(turnContext, cancellationToken);
 
-
+                    //Record the Question in ApplicationInsights
+                    var properties = new Dictionary<string, string>
+                    { {"Question",QuestionAsked}, {"Email",Email }};
+                    TelemetryClient client = new TelemetryClient();
+                    client.TrackEvent("NotCorrectAnswerGiven", properties);
 
                     //The next line starts the conversation again with options and instructions.
                     await SendSuggestedActionsAsync(turnContext, cancellationToken);
@@ -82,7 +92,6 @@ namespace Microsoft.BotBuilderSamples.Bots
                     await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
                     //Capture the question that was sent to QnAMaker
                     QuestionAsked = turnContext.Activity.Text;
-                    AnswerProvided = turnContext.Activity.ChannelData;
                     await SendAskForFeedbackAsync(turnContext, cancellationToken);
                     break;
             }
@@ -147,5 +156,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             };
             await turnContext.SendActivityAsync(reply, cancellationToken);
         }
+
+ 
     }
 }
