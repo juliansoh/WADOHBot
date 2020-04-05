@@ -73,38 +73,6 @@ namespace Microsoft.BotBuilderSamples.Bots
             // Extract the text from the message activity the user sent.
             var text = turnContext.Activity.Text.ToLower();
 
-            if (IsLanguageChangeRequested(turnContext.Activity.Text))
-            {
-                var currentLang = turnContext.Activity.Text.ToLower();
-                //var lang = currentLang;
-                var lang = currentLang == EnglishEnglish || currentLang == SpanishEnglish ? EnglishEnglish : EnglishSpanish;
-                await _languagePreference.SetAsync(turnContext, lang, cancellationToken);
-                var reply = MessageFactory.Text($"Your current language code is: {lang}");
-                await turnContext.SendActivityAsync(reply, cancellationToken);
-
-                // Save the user profile updates into the user state.
-                await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
-
-                // Run the Dialog with the new message Activity through QnAMaker
-                //await Dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
-            }
-            else
-            /*{
-                // Show the user the possible options for language. If the user chooses a different language
-                // than the default, then the translation middleware will pick it up from the user state and
-                // translate messages both ways, i.e. user to bot and bot to user.
-                var reply = MessageFactory.Text("Choose your language:");
-                reply.SuggestedActions = new SuggestedActions()
-                {
-                    Actions = new List<CardAction>()
-                        {
-                            new CardAction() { Title = "Español", Type = ActionTypes.PostBack, Value = EnglishSpanish },
-                            new CardAction() { Title = "English", Type = ActionTypes.PostBack, Value = EnglishEnglish },
-                        },
-                };
-            }*/
-            //Check to see if the user just responded to a feedback, said bye, or anything that we may not send to QnAMaker. If no
-            //conditions met, then assume it's a question destined for the QnAMaker channel.
             {
                 switch (text)
                 {
@@ -177,15 +145,19 @@ namespace Microsoft.BotBuilderSamples.Bots
                 // To learn more about Adaptive Cards, see https://aka.ms/msbot-adaptivecards for more details.
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
+                    //Send one-time welcome message
+                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.WelcomeMessage), cancellationToken);
+
                     var welcomeCard = CreateAdaptiveCardAttachment();
                     var response = MessageFactory.Attachment(welcomeCard);
                     await turnContext.SendActivityAsync(response, cancellationToken);
-                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.WelcomeMessage), cancellationToken);
+                    
                     //Send Suggested actions - Replaced with AdaptiveCardAttachment()
                     //await SendSuggestedActionsAsync(turnContext, cancellationToken);
-                    var reply = MessageFactory.Text("Choose your language:");
-                    //Ask for language
-                    reply.SuggestedActions = new SuggestedActions()
+
+                    //Ask for language (Placeholder)
+                    //var reply = MessageFactory.Text("Choose your language:");
+                    /*reply.SuggestedActions = new SuggestedActions()
                     {
                         Actions = new List<CardAction>()
                         {
@@ -199,6 +171,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                 
                     };
                     await turnContext.SendActivityAsync(reply, cancellationToken);
+                    */
                 }
             }
         }
