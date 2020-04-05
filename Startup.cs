@@ -10,11 +10,13 @@ using Microsoft.BotBuilderSamples.Bots;
 using Microsoft.BotBuilderSamples.Dialog;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
 
 namespace Microsoft.BotBuilderSamples
 {
     public class Startup
     {
+        public static HttpClient HttpClient = new HttpClient();
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;

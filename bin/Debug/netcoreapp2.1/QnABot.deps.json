@@ -24,6 +24,7 @@
     ".NETCoreApp,Version=v2.1": {
       "QnABot/1.0.0": {
         "dependencies": {
+          "AdaptiveCards": "1.2.4",
           "Microsoft.ApplicationInsights": "2.13.1",
           "Microsoft.ApplicationInsights.AspNetCore": "2.12.0",
           "Microsoft.AspNetCore.App": "2.1.1",
@@ -37,6 +38,21 @@
         },
         "compile": {
           "QnABot.dll": {}
+        }
+      },
+      "AdaptiveCards/1.2.4": {
+        "dependencies": {
+          "Microsoft.CSharp": "4.5.0",
+          "Newtonsoft.Json": "12.0.3"
+        },
+        "runtime": {
+          "lib/netstandard2.0/AdaptiveCards.dll": {
+            "assemblyVersion": "1.2.0.0",
+            "fileVersion": "1.2.1911.4003"
+          }
+        },
+        "compile": {
+          "lib/netstandard2.0/AdaptiveCards.dll": {}
         }
       },
       "Microsoft.ApplicationInsights/2.13.1": {
@@ -3693,6 +3709,13 @@
       "type": "project",
       "serviceable": false,
       "sha512": ""
+    },
+    "AdaptiveCards/1.2.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qCqnzBIY/+sd255ccl0IaGeJoJoOaYeMuybLUM/VKREHp8n83fd6rIv2Ba3wgacyoEqGWxTDRro/M4eiZR5awQ==",
+      "path": "adaptivecards/1.2.4",
+      "hashPath": "adaptivecards.1.2.4.nupkg.sha512"
     },
     "Microsoft.ApplicationInsights/2.13.1": {
       "type": "package",
