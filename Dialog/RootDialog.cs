@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Builder.AI.QnA;
 using Microsoft.Bot.Builder.AI.QnA.Dialogs;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.BotBuilderSamples.Dialog
 {
@@ -19,6 +20,7 @@ namespace Microsoft.BotBuilderSamples.Dialog
         /// QnA Maker initial dialog
         /// </summary>
         private const string InitialDialog = "initial-dialog";
+        IConfiguration _configuration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RootDialog"/> class.
