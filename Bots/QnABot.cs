@@ -91,12 +91,15 @@ namespace Microsoft.BotBuilderSamples.Bots
                         client.TrackEvent("NotCorrectAnswerGiven", properties);
 
                         //The next line starts the conversation again with options and instructions.
-                        await SendSuggestedActionsAsync(turnContext, cancellationToken);
+                        //await SendSuggestedActionsAsync(turnContext, cancellationToken);
+                        await SendSuggestedActionsAsyncCard(turnContext, cancellationToken);
                         break;
 
                     case "yes":
                         await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedbackYes), cancellationToken);
-                        await SendSuggestedActionsAsync(turnContext, cancellationToken);
+                        //await SendSuggestedActionsAsync(turnContext, cancellationToken);
+                        await SendSuggestedActionsAsyncCard(turnContext, cancellationToken);
+
                         break;
 
                     case "bye":
@@ -148,12 +151,10 @@ namespace Microsoft.BotBuilderSamples.Bots
                     //Send one-time welcome message
                     await turnContext.SendActivityAsync(MessageFactory.Text(Constants.WelcomeMessage), cancellationToken);
 
-                    var welcomeCard = CreateAdaptiveCardAttachment();
-                    var response = MessageFactory.Attachment(welcomeCard);
-                    await turnContext.SendActivityAsync(response, cancellationToken);
-                    
-                    //Send Suggested actions - Replaced with AdaptiveCardAttachment()
+                    //Send Suggested actions - Replaced with AdaptiveCardAttachment() - see next line
                     //await SendSuggestedActionsAsync(turnContext, cancellationToken);
+
+                    await SendSuggestedActionsAsyncCard(turnContext, cancellationToken);
 
                     //Ask for language (Placeholder)
                     //var reply = MessageFactory.Text("Choose your language:");
@@ -176,6 +177,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             }
         }
 
+        //SendSuggestedActionAsync replaced by SendSuggestedActionsAsyncCard, which is an Adaptive Card option.
         private static async Task SendSuggestedActionsAsync(ITurnContext turnContext, CancellationToken cancellationToken)
         {
             var reply = MessageFactory.Text(Constants.Instructions);
@@ -190,6 +192,13 @@ namespace Microsoft.BotBuilderSamples.Bots
                 },
             };
             await turnContext.SendActivityAsync(reply, cancellationToken);
+        }
+
+        private static async Task SendSuggestedActionsAsyncCard(ITurnContext turnContext, CancellationToken cancellationToken)
+        {
+            var welcomeCard = CreateAdaptiveCardAttachment();
+            var response = MessageFactory.Attachment(welcomeCard);
+            await turnContext.SendActivityAsync(response, cancellationToken);
         }
 
         private static async Task SendAskForFeedbackAsync(ITurnContext turnContext, CancellationToken cancellationToken)
