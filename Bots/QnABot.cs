@@ -1,6 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
+using System;
+using System.Globalization;
+using System.IO;
+using System.Text;
+using System.Web;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,32 +19,41 @@ using Microsoft.Extensions.Logging;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using QnABot.Model;
+using static Microsoft.Bot.Builder.Dialogs.Choices.Channel;
 
 namespace Microsoft.BotBuilderSamples.Bots
 {
     public class QnABot<T> : ActivityHandler where T : Microsoft.Bot.Builder.Dialogs.Dialog
     {
-        protected readonly BotState ConversationState;
+        protected readonly BotState _conversationState;
         protected readonly Microsoft.Bot.Builder.Dialogs.Dialog Dialog;
-        protected readonly BotState UserState;
+        protected readonly BotState _userState;
+        IConfiguration _configuration;
+        static public string[] SupportedLanguages = new string[] { "en", "es", "fr", "ja", "zh", "de" };
         public static string QuestionAsked;
         public static string Email;
         //public string AnswerProvided;
         
-        public QnABot(ConversationState conversationState, UserState userState, T dialog)
+        public QnABot(ConversationState conversationState, UserState userState, T dialog, IConfiguration configuration)
         {
-            ConversationState = conversationState;
-            UserState = userState;
+            _conversationState = conversationState;
+            this._userState = userState;
             Dialog = dialog;
+            _configuration = configuration;
         }
+
 
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
             await base.OnTurnAsync(turnContext, cancellationToken);
 
             // Save any state changes that might have occured during the turn.
-            await ConversationState.SaveChangesAsync(turnContext, false, cancellationToken);
-            await UserState.SaveChangesAsync(turnContext, false, cancellationToken);
+            await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
+            await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
         }
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
@@ -89,7 +106,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
                 default:
                     // Run the Dialog with the new message Activity through QnAMaker
-                    await Dialog.RunAsync(turnContext, ConversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
+                    await Dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
                     //Capture the question that was sent to QnAMaker
                     QuestionAsked = turnContext.Activity.Text;
                     await SendAskForFeedbackAsync(turnContext, cancellationToken);

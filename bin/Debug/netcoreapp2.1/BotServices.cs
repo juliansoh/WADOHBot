@@ -3,19 +3,23 @@
 
 using Microsoft.Bot.Builder.AI.QnA;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Bot.Builder;
+using QnABot.Utility;
 
 namespace Microsoft.BotBuilderSamples
 {
     public class BotServices : IBotServices
     {
-        public BotServices(IConfiguration configuration)
+        public BotServices(IConfiguration configuration, ConversationState conversationState)
         {
-            QnAMakerService = new QnAMaker(new QnAMakerEndpoint
+            QnAMakerService = new CustomQnaMakerClient(new QnAMakerEndpoint
             {
                 KnowledgeBaseId = configuration["QnAKnowledgebaseId"],
                 EndpointKey = configuration["QnAAuthKey"],
                 Host = GetHostname(configuration["QnAEndpointHostName"])
-            });
+            },
+            configuration,
+            conversationState);
         }
 
         public QnAMaker QnAMakerService { get; private set; }

@@ -11,6 +11,7 @@ using Microsoft.Bot.Builder.AI.QnA;
 using Microsoft.Bot.Builder.AI.QnA.Dialogs;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.BotBuilderSamples.Dialog
 {
@@ -19,11 +20,7 @@ namespace Microsoft.BotBuilderSamples.Dialog
     /// </summary>
     public class QnAMakerBaseDialog : QnAMakerDialog
     {
-        // Dialog Options parameters
-        public const string DefaultNoAnswer = "No answers found.";
-        public const string DefaultCardTitle = "Did you mean:";
-        public const string DefaultCardNoMatchText = "None of the above.";
-        public const string DefaultCardNoMatchResponse = "Thanks for the feedback.";
+        IConfiguration _configuration;
 
         private readonly IBotServices _services;
 
@@ -32,9 +29,10 @@ namespace Microsoft.BotBuilderSamples.Dialog
         /// Dialog helper to generate dialogs.
         /// </summary>
         /// <param name="services">Bot Services.</param>
-        public QnAMakerBaseDialog(IBotServices services): base()
+        public QnAMakerBaseDialog(IBotServices services, IConfiguration configuration): base()
         {
             this._services = services;
+            _configuration = configuration;
         }
 
         protected async override Task<IQnAMakerClient> GetQnAMakerClientAsync(DialogContext dc)
@@ -46,9 +44,8 @@ namespace Microsoft.BotBuilderSamples.Dialog
         {
             return Task.FromResult(new QnAMakerOptions
             {
-                //Chuong - This variable can be set.  ScoreThreshold is for confident score 
-                ScoreThreshold = 0.5F,
-                Top = DefaultTopN,
+                ScoreThreshold = float.Parse(_configuration["DefaultThreshold"]),
+                Top = int.Parse(_configuration["NumberOfAnswersToReturn"]),
                 QnAId = 0,
                 RankerType = "Default",
                 IsTest = false
@@ -58,20 +55,25 @@ namespace Microsoft.BotBuilderSamples.Dialog
         protected async override Task<QnADialogResponseOptions> GetQnAResponseOptionsAsync(DialogContext dc)
         {
             var noAnswer = (Activity)Activity.CreateMessageActivity();
-            noAnswer.Text = DefaultNoAnswer;
+            noAnswer.Text = _configuration["DefaultNoAnswer"];
 
-            var cardNoMatchResponse = (Activity)MessageFactory.Text(DefaultCardNoMatchResponse);
-           
+            var cardNoMatchResponse = (Activity)MessageFactory.Text(_configuration["DefaultCardNoMatchResponse"]);
 
             var responseOptions = new QnADialogResponseOptions
             {
-                ActiveLearningCardTitle = DefaultCardTitle,
-                CardNoMatchText = DefaultCardNoMatchText,
+                ActiveLearningCardTitle = _configuration["DefaultCardTitle"],
+                CardNoMatchText = _configuration["DefaultCardNoMatchText"],
                 NoAnswer = noAnswer,
                 CardNoMatchResponse = cardNoMatchResponse,
             };
 
             return responseOptions;
         }
+
+        async public override Task<DialogTurnResult> BeginDialogAsync(DialogContext dc, object options = null, CancellationToken cancellationToken = default)
+        {
+            return await base.BeginDialogAsync(dc, options, cancellationToken);
+        }
     }
 }
+

@@ -10,11 +10,15 @@ using Microsoft.BotBuilderSamples.Bots;
 using Microsoft.BotBuilderSamples.Dialog;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.BotBuilderSamples.Translation;
+using System.Net.Http;
 
 namespace Microsoft.BotBuilderSamples
 {
     public class Startup
     {
+        public static HttpClient HttpClient = new HttpClient();
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -44,6 +48,12 @@ namespace Microsoft.BotBuilderSamples
 
             // The Dialog that will be run by the bot.
             services.AddSingleton<RootDialog>();
+
+            // Create the Microsoft Translator responsible for making calls to the Cognitive Services translation service
+            services.AddSingleton<MicrosoftTranslator>();
+
+            // Create the Translation Middleware that will be added to the middleware pipeline in the AdapterWithErrorHandler
+            services.AddSingleton<TranslationMiddleware>();
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
             services.AddTransient<IBot, QnABot<RootDialog>>();

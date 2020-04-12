@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Bot.Builder.AI.QnA;
 using Microsoft.Bot.Builder.AI.QnA.Dialogs;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Schema;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.BotBuilderSamples.Dialog
@@ -26,10 +27,12 @@ namespace Microsoft.BotBuilderSamples.Dialog
         /// Initializes a new instance of the <see cref="RootDialog"/> class.
         /// </summary>
         /// <param name="services">Bot Services.</param>
-        public RootDialog(IBotServices services)
+        public RootDialog(IBotServices services, IConfiguration configuration)
             : base("root")
         {
-            AddDialog(new QnAMakerBaseDialog(services));
+            _configuration = configuration;
+
+            AddDialog(new QnAMakerBaseDialog(services, configuration));
 
             AddDialog(new WaterfallDialog(InitialDialog)
                .AddStep(InitialStepAsync));
@@ -40,7 +43,36 @@ namespace Microsoft.BotBuilderSamples.Dialog
 
         private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.BeginDialogAsync(nameof(QnAMakerDialog), null, cancellationToken);
+            // Set values for generate answer options.
+            var qnamakerOptions = new QnAMakerOptions
+            {
+                ScoreThreshold = float.Parse(_configuration["DefaultThreshold"]),
+                Top = int.Parse(_configuration["NumberOfAnswersToReturn"]),
+                Context = new QnARequestContext()
+            };
+
+            var noAnswer = (Activity)Activity.CreateMessageActivity();
+            noAnswer.Text = _configuration["DefaultNoAnswer"];
+
+            var defaultCardNoMatchResponse = (Activity)Activity.CreateMessageActivity();
+            defaultCardNoMatchResponse.Text = _configuration["DefaultCardNoMatchResponse"];
+
+            // Set values for dialog responses.
+            var qnaDialogResponseOptions = new QnADialogResponseOptions
+            {
+                NoAnswer = noAnswer,
+                CardNoMatchResponse = defaultCardNoMatchResponse,
+                CardNoMatchText = _configuration["DefaultCardNoMatchText"],
+                ActiveLearningCardTitle = _configuration["DefaultCardTitle"]
+            };
+
+            var dialogOptions = new Dictionary<string, object>
+            {
+                { "QnAOptions", qnamakerOptions },
+                { "QnADialogResponseOptions", qnaDialogResponseOptions }
+            };
+
+            return await stepContext.BeginDialogAsync(nameof(QnAMakerDialog), dialogOptions, cancellationToken);
         }
     }
 }
