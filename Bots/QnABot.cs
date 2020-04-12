@@ -55,14 +55,51 @@ namespace Microsoft.BotBuilderSamples.Bots
             await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
         }
 
+        protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
+        {
+            foreach (var member in membersAdded)
+            {
+                if (member.Id != turnContext.Activity.Recipient.Id)
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.WelcomeMessage), cancellationToken);
+                    //Send Suggested actions
+                    await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
+                }
+            }
+        }
+
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
+            // Grab the conversation data
+            var conversationStateAccessors = _conversationState.CreateProperty<ConversationData>(nameof(ConversationData));
+            var conversationData = await conversationStateAccessors.GetAsync(turnContext, () => new ConversationData());
+            string utterance = null;
+
+
             // Extract the text from the message activity the user sent.
             var text = turnContext.Activity.Text.ToLower();
 
+            //If language change needed (and assuming it is zh for now)
+            if(text == "zh")
+            {
+                string language = utterance;
+                var fullWelcomePrompt = _configuration["WelcomeCardTitle"] + ". " + _configuration["WelcomePrompt"];
+                string detection_re_welcomeMessage = $"{_configuration["LanguageTransitionPrompt"]}\r\n\r\n{fullWelcomePrompt}\r\n\r\n{_configuration["QuestionSegue"]}";
+                var dectection_re_welcomePrompt = MessageFactory.Text(detection_re_welcomeMessage);
+                var languageChange_re_welcomePrompt = MessageFactory.Text(fullWelcomePrompt);
+
+                conversationData.LanguageChangeRequested = false;
+
+                // Re-welcome user in their language
+                await turnContext.SendActivityAsync(languageChange_re_welcomePrompt, cancellationToken);
+                
+            }
+            else
+                await Dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
+
             //Check to see if the user just responded to a feedback, said bye, or anything that we may not send to QnAMaker. If no
             //conditions met, then assume it's a question destined for the QnAMaker channel.
-            switch(text)
+            switch (text)
             {
                 //Visitor answered "No"
                 case "no":
@@ -106,6 +143,7 @@ namespace Microsoft.BotBuilderSamples.Bots
 
                 default:
                     // Run the Dialog with the new message Activity through QnAMaker
+                    //await Dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
                     await Dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
                     //Capture the question that was sent to QnAMaker
                     QuestionAsked = turnContext.Activity.Text;
@@ -114,20 +152,48 @@ namespace Microsoft.BotBuilderSamples.Bots
             }
 
         }
-       
-        protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
+
+        private string ConvertToUtterance(ITurnContext<IMessageActivity> turnContext)
         {
-            foreach (var member in membersAdded)
+            string utterance = null;
+
+            // If this is a postback, check to see if its a "preferred language" choice
+            if (turnContext.Activity.Value != null)
             {
-                if (member.Id != turnContext.Activity.Recipient.Id)
-                {
-                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.WelcomeMessage), cancellationToken);
-                    //Send Suggested actions
-                    await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
-                }
+                // Split out the language choice
+                string[] tokens = turnContext.Activity.Value
+                                                        .ToString()
+                                                        .Replace('{', ' ')
+                                                        .Replace('}', ' ')
+                                                        .Replace('"', ' ')
+                                                        .Trim()
+                                                        .Split(':');
+
+                // If postback is a language choice then grab that choice
+                if (tokens.Count() == 2 && tokens[0].Trim() == "LanguagePreference")
+                    turnContext.Activity.Text = utterance = tokens[1].Trim();
             }
+            else
+            {
+                utterance = turnContext.Activity.Text.ToLower();
+            }
+
+            return utterance;
         }
 
+        private bool IsLanguageChangeRequested(string utterance)
+        {
+            if (string.IsNullOrEmpty(utterance))
+            {
+                return false;
+            }
+
+            // If the user requested a language change through the suggested actions with values "es" or "en",
+            // simply change the user's language preference in the conversation state.
+            // The translation middleware will catch this setting and translate both ways to the user's
+            // selected language.
+            return SupportedLanguages.Contains(utterance);
+        }
  
         private static async Task SendSuggestedActionsCardAsync(ITurnContext turnContext, CancellationToken cancellationToken)
         {
