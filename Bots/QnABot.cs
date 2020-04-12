@@ -46,7 +46,6 @@ namespace Microsoft.BotBuilderSamples.Bots
             _configuration = configuration;
         }
 
-
         public override async Task OnTurnAsync(ITurnContext turnContext, CancellationToken cancellationToken = default)
         {
             await base.OnTurnAsync(turnContext, cancellationToken);
@@ -80,12 +79,13 @@ namespace Microsoft.BotBuilderSamples.Bots
                     client.TrackEvent("NotCorrectAnswerGiven", properties);
 
                     //The next line starts the conversation again with options and instructions.
-                    await SendSuggestedActionsAsync(turnContext, cancellationToken);
+                    //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
                     break;
 
                 case "yes":
                     await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedbackYes), cancellationToken);
-                    await SendSuggestedActionsAsync(turnContext, cancellationToken);
+                    //The next line starts the conversation again with options and instructions.
+                    //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
                     break;
 
                 case "bye":
@@ -123,25 +123,31 @@ namespace Microsoft.BotBuilderSamples.Bots
                 {
                     await turnContext.SendActivityAsync(MessageFactory.Text(Constants.WelcomeMessage), cancellationToken);
                     //Send Suggested actions
-                    await SendSuggestedActionsAsync(turnContext, cancellationToken);
+                    await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
                 }
-        }
+            }
         }
 
-        private static async Task SendSuggestedActionsAsync(ITurnContext turnContext, CancellationToken cancellationToken)
+ 
+        private static async Task SendSuggestedActionsCardAsync(ITurnContext turnContext, CancellationToken cancellationToken)
         {
-            var reply = MessageFactory.Text(Constants.Instructions);
+            var welcomeCard = CreateAdaptiveCardAttachment();
+            var response = MessageFactory.Attachment(welcomeCard);
+            await turnContext.SendActivityAsync(response, cancellationToken);
+        }
 
-            reply.SuggestedActions = new SuggestedActions()
+        // Load attachment from file.
+        private static Attachment CreateAdaptiveCardAttachment()
+        {
+            // combine path for cross platform support
+            string[] paths = { ".", "Cards", "welcomeCard.json" };
+            var fullPath = Path.Combine(paths);
+            var adaptiveCard = File.ReadAllText(fullPath);
+            return new Attachment()
             {
-                Actions = new List<CardAction>()
-                {
-                    new CardAction() { Title = "What is Covid-19", Type = ActionTypes.ImBack, Value = "What is Covid-19" },
-                    new CardAction() { Title = "Symptoms of Covid-19", Type = ActionTypes.ImBack, Value = "Symptoms of Covid-19" },
-                    new CardAction() { Title = "How does Covid-19 spread", Type = ActionTypes.ImBack, Value = "How does Covid-19 spread" },
-                },
+                ContentType = "application/vnd.microsoft.card.adaptive",
+                Content = JsonConvert.DeserializeObject(adaptiveCard),
             };
-            await turnContext.SendActivityAsync(reply, cancellationToken);
         }
 
         private static async Task SendAskForFeedbackAsync(ITurnContext turnContext, CancellationToken cancellationToken)
