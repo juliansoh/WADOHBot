@@ -27,7 +27,7 @@ namespace Microsoft.BotBuilderSamples.Translation
         private readonly MicrosoftTranslator _translator;
         ConversationState _conversationState;
         IConfiguration _configuration;
-        static public string[] SupportedLanguages = new string[] { "en", "es", "fr", "ja", "zh", "de" };
+        static public string[] SupportedLanguages = new string[] { "en", "es", "ko", "ja", "zh", "vi" };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TranslationMiddleware"/> class.

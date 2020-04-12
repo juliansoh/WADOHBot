@@ -33,7 +33,7 @@ namespace Microsoft.BotBuilderSamples.Bots
         protected readonly Microsoft.Bot.Builder.Dialogs.Dialog Dialog;
         protected readonly BotState _userState;
         IConfiguration _configuration;
-        static public string[] SupportedLanguages = new string[] { "en", "es", "fr", "ja", "zh", "de" };
+        static public string[] SupportedLanguages = new string[] { "en", "es", "ko", "ja", "zh", "vi" };
         public static string QuestionAsked;
         public static string Email;
         //public string AnswerProvided;
@@ -61,9 +61,13 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.WelcomeMessage), cancellationToken);
+                    //Commenting out Welcome Message in lieu of selecting language first, then showing Welcome Message in user's native language.
+                    //await turnContext.SendActivityAsync(MessageFactory.Text(Constants.WelcomeMessage), cancellationToken);
+                    
+                    //Ask for preferred language
+                    await AskPreferredLanguageCardAsync(turnContext, cancellationToken);
                     //Send Suggested actions
-                    await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
+                    //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
                 }
             }
         }
@@ -75,32 +79,44 @@ namespace Microsoft.BotBuilderSamples.Bots
             var conversationData = await conversationStateAccessors.GetAsync(turnContext, () => new ConversationData());
             string utterance = null;
 
-
             // Extract the text from the message activity the user sent.
             var text = turnContext.Activity.Text.ToLower();
 
             //If language change needed (and assuming it is zh for now)
-            if(text == "zh")
+            //Check to see if response is a selection of a language
+            //if(SupportedLanguages.All(text.Contains))
+            bool MatchingLanguage = Array.Exists(SupportedLanguages, element => element == text);
+            if(MatchingLanguage == true)
             {
                 string language = utterance;
                 var fullWelcomePrompt = _configuration["WelcomeCardTitle"] + ". " + _configuration["WelcomePrompt"];
-                string detection_re_welcomeMessage = $"{_configuration["LanguageTransitionPrompt"]}\r\n\r\n{fullWelcomePrompt}\r\n\r\n{_configuration["QuestionSegue"]}";
+                //string detection_re_welcomeMessage = $"{_configuration["LanguageTransitionPrompt"]}\r\n\r\n{fullWelcomePrompt}\r\n\r\n{_configuration["QuestionSegue"]}";
+                string detection_re_welcomeMessage = $"{_configuration["LanguageTransitionPrompt"]}\r\n\r\n{Constants.WelcomeMessage}";
                 var dectection_re_welcomePrompt = MessageFactory.Text(detection_re_welcomeMessage);
                 var languageChange_re_welcomePrompt = MessageFactory.Text(fullWelcomePrompt);
 
+                //Reset this flag
                 conversationData.LanguageChangeRequested = false;
 
+                //Reset Text so it will not be triggered by the switch statements below
+                text = "LanguageWasChanged";
+
                 // Re-welcome user in their language
-                await turnContext.SendActivityAsync(languageChange_re_welcomePrompt, cancellationToken);
+                await turnContext.SendActivityAsync(dectection_re_welcomePrompt, cancellationToken);
                 
             }
-            else
-                await Dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
+            //else
+                //await Dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
 
             //Check to see if the user just responded to a feedback, said bye, or anything that we may not send to QnAMaker. If no
             //conditions met, then assume it's a question destined for the QnAMaker channel.
             switch (text)
             {
+                //A language choice was selected (see above)
+                case "LanguageWasChanged":
+                    //do nothing. it was a language change
+                    break;
+
                 //Visitor answered "No"
                 case "no":
                     //Respond to the visitor that we acknowledge their "No" feedback
@@ -197,16 +213,25 @@ namespace Microsoft.BotBuilderSamples.Bots
  
         private static async Task SendSuggestedActionsCardAsync(ITurnContext turnContext, CancellationToken cancellationToken)
         {
-            var welcomeCard = CreateAdaptiveCardAttachment();
+            var welcomeCard = CreateAdaptiveCardAttachment("welcomeCard.json");
             var response = MessageFactory.Attachment(welcomeCard);
             await turnContext.SendActivityAsync(response, cancellationToken);
         }
 
+        private static async Task AskPreferredLanguageCardAsync(ITurnContext turnContext, CancellationToken cancellationToken)
+        {
+            var languageCard = CreateAdaptiveCardAttachment("SelectLanguageCard.json");
+            var response = MessageFactory.Attachment(languageCard);
+            await turnContext.SendActivityAsync(response, cancellationToken);
+        }
+
+
         // Load attachment from file.
-        private static Attachment CreateAdaptiveCardAttachment()
+        private static Attachment CreateAdaptiveCardAttachment(string cardType)
         {
             // combine path for cross platform support
-            string[] paths = { ".", "Cards", "welcomeCard.json" };
+            //string[] paths = { ".", "Cards", "welcomeCard.json" };
+            string[] paths = { ".", "Cards", cardType };
             var fullPath = Path.Combine(paths);
             var adaptiveCard = File.ReadAllText(fullPath);
             return new Attachment()

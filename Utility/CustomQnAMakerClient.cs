@@ -34,7 +34,7 @@ namespace QnABot.Utility
             var highestScoredAnswer = queryResults.OrderByDescending(i => i.Score).FirstOrDefault();
 
             // Append feeback prompt if one was provided
-            if (highestScoredAnswer != null && !string.IsNullOrWhiteSpace(_configuration["FeedbackPrompt"]))
+            /*if (highestScoredAnswer != null && !string.IsNullOrWhiteSpace(_configuration["FeedbackPrompt"]))
             {
                 bool isFeedbackKeyword = false;
                 string[] feedbackKeywords = _configuration["FeedbackKeywords"].Split(",");
@@ -60,7 +60,8 @@ namespace QnABot.Utility
                     conversationData.PreviousQuestion = turnContext.Activity.Text;
                     conversationData.PreviousAnswer = highestScoredAnswer.Answer;
 
-                    highestScoredAnswer.Answer += _configuration["FeedbackPrompt"];
+                    //Not using this option - Unless you want the user to type "Confusing" or "Wrong" as a feedback loop. Using buttons for feedback.
+                    //highestScoredAnswer.Answer += _configuration["FeedbackPrompt"];
                 }
                 else 
                 {
@@ -83,7 +84,7 @@ namespace QnABot.Utility
                         }
                     }
                 }
-            }
+            }*/
 
             await base.OnQnaResultsAsync(queryResults, turnContext, telemetryProperties, telemetryMetrics, cancellationToken);
         }

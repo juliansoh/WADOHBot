@@ -1,0 +1,52 @@
+﻿{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Hello, 你好, 안녕하세요, Xin chào, こんにちは, Hola",
+          "size": "Medium",
+          "wrap": true
+        }
+      ],
+      "style": "good",
+      "bleed": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Speak to me in English",
+      "data": "en"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "用中文跟我说话",
+      "data": "zh"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "한국어로 나에게 이야기",
+      "data": "ko"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "nói chuyện với tôi bằng Việt Nam",
+      "data": "vi"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "日本語で私に話しかける",
+      "data": "ja"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "háblame en español",
+      "data": "es"
+    }
+  ]
+}
