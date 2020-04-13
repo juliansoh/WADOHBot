@@ -2,7 +2,9 @@
 // Licensed under the MIT License.
 
 using System;
+using System.IO;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -15,6 +17,8 @@ using Microsoft.BotBuilderSamples.Dialog;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using QnABot.Model;
+
+
 
 namespace Microsoft.BotBuilderSamples.Translation
 {
@@ -68,6 +72,9 @@ namespace Microsoft.BotBuilderSamples.Translation
 
                 if (IsLanguageChangeRequested(utterance))
                 {
+                    //Before converting the language, first dynamically build the ActivityCard then display it
+                    await AskMultilingualActivityCardAsync(utterance, turnContext, cancellationToken);
+
                     conversationData.LanguageChangeRequested = true;
                     conversationData.LanguagePreference = utterance;
                 }
@@ -247,5 +254,27 @@ namespace Microsoft.BotBuilderSamples.Translation
 
             return utterance;
         }
+
+        private static async Task AskMultilingualActivityCardAsync(string lang, ITurnContext turnContext, CancellationToken cancellationToken)
+        {
+            string displayThisLanguageCard = lang + "SelectActivityCard.json";
+            var languageActivityCard = CreateAdaptiveCardAttachment(displayThisLanguageCard);
+            var response = MessageFactory.Attachment(languageActivityCard);
+            await turnContext.SendActivityAsync(response, cancellationToken);
+        }
+
+        private static Attachment CreateAdaptiveCardAttachment(string cardType)
+        {
+            // combine path for cross platform support
+            string[] paths = { ".", "Cards", cardType };
+            var fullPath = Path.Combine(paths);
+            var adaptiveCard = File.ReadAllText(fullPath);
+            return new Attachment()
+            {
+                ContentType = "application/vnd.microsoft.card.adaptive",
+                Content = JsonConvert.DeserializeObject(adaptiveCard),
+            };
+        }
+
     }
 }

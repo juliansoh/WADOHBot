@@ -1,0 +1,46 @@
+﻿{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Hi, I'm the DOH chatbot và tôi mới. Cảm ơn bạn đã kiên nhẫn của bạn khi chúng tôi phát triển dịch vụ mới này. Nếu tôi không thể trả lời câu hỏi của bạn, hoặc nếu bạn tìm thấy một vấn đề với hệ thống của tôi mà bạn muốn báo cáo, xin vui lòng gửi email đến [DOH.information@doh.wa.gov](mailto:DOH.information@doh.wa.gov).",
+      "wrap": true
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Nhập tin nhắn của bạn hoặc chọn câu hỏi thường gặp.",
+          "wrap": true
+        }
+      ],
+      "style": "good",
+      "bleed": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Covid-19 là gì?",
+      "data": "Covid-19 là gì?"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Các triệu chứng là gì?",
+      "data": "Các triệu chứng là gì?"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Covid-19 lây lan như thế nào?",
+      "data": "Covid-19 lây lan như thế nào?"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Tổng số trường hợp trong tiểu bang Washington là gì?",
+      "data": "Tổng số trường hợp trong tiểu bang Washington là gì?"
+    }
+  ]
+}

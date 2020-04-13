@@ -1,0 +1,46 @@
+﻿{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "嗨，我是DOH聊天机器人，我是新的。感谢您的耐心，因为我们开发这项新服务。如果我无法回答您的问题，或者您发现我的系统有问题，您要报告，请发送电子邮件至[DOH.information@doh.wa.gov](mailto:DOH.information@doh.wa.gov)。",
+      "wrap": true
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "键入选择常见问题的消息。",
+          "wrap": true
+        }
+      ],
+      "style": "good",
+      "bleed": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "什么是科维德-19？",
+      "data": "什么是科维德-19？"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "什么是符号？",
+      "data": "什么是符号？"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "科维德-19是如何传播的？",
+      "data": "科维德-19是如何传播的？"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "科维德-19是如何传播的？",
+      "data": "科维德-19是如何传播的？"
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
 using System;
@@ -88,6 +88,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             bool MatchingLanguage = Array.Exists(SupportedLanguages, element => element == text);
             if(MatchingLanguage == true)
             {
+                //That means var text contains a language code "en", "es", "ja", "vi" or "zh"
                 string language = utterance;
                 var fullWelcomePrompt = _configuration["WelcomeCardTitle"] + ". " + _configuration["WelcomePrompt"];
                 //string detection_re_welcomeMessage = $"{_configuration["LanguageTransitionPrompt"]}\r\n\r\n{fullWelcomePrompt}\r\n\r\n{_configuration["QuestionSegue"]}";
@@ -98,12 +99,12 @@ namespace Microsoft.BotBuilderSamples.Bots
                 //Reset this flag
                 conversationData.LanguageChangeRequested = false;
 
+                // Re-welcome user in their language **Removed because we incorporated this as part of the ActivitySyncCard in their language**
+                //await turnContext.SendActivityAsync(dectection_re_welcomePrompt, cancellationToken);
+
                 //Reset Text so it will not be triggered by the switch statements below
                 text = "LanguageWasChanged";
 
-                // Re-welcome user in their language
-                await turnContext.SendActivityAsync(dectection_re_welcomePrompt, cancellationToken);
-                
             }
             //else
                 //await Dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
@@ -224,7 +225,15 @@ namespace Microsoft.BotBuilderSamples.Bots
             var response = MessageFactory.Attachment(languageCard);
             await turnContext.SendActivityAsync(response, cancellationToken);
         }
-
+        private static async Task AskMultilingualActivityCardAsync(string lang, ITurnContext turnContext, CancellationToken cancellationToken)
+        {
+            //var displayThisLanguageCard = lang + "SelectActivityCard.json";
+            //var temp = displayThisLanguageCard;
+            //var languageCard = CreateAdaptiveCardAttachment(displayThisLanguageCard);
+            var languageActivityCard = CreateAdaptiveCardAttachment("zhSelectActivityCard.json");
+            var response = MessageFactory.Attachment(languageActivityCard);
+            await turnContext.SendActivityAsync(response, cancellationToken);
+        }
 
         // Load attachment from file.
         private static Attachment CreateAdaptiveCardAttachment(string cardType)
@@ -271,6 +280,29 @@ namespace Microsoft.BotBuilderSamples.Bots
             await turnContext.SendActivityAsync(reply, cancellationToken);
         }
 
- 
+        private Attachment CreateMultilingualCard(string cardlanguage)
+        {
+            string buttonLanguage = cardlanguage + "Buttons";
+            
+            // combine path for cross platform support
+            string[] paths = { ".", "Cards", "MultilingualCardTemplate.json" };
+            string adaptiveCardTemplate = File.ReadAllText(Path.Combine(paths));
+
+            // Replace any placeholders in the WelcomeAdaptiveCard from appsetting.json
+         
+            string welcomeAdaptiveCard = adaptiveCardTemplate
+                .Replace("{Instructions}", _configuration.GetSection(buttonLanguage).GetSection("Instructions").Value, true, CultureInfo.CurrentCulture)
+                .Replace("{Button1Text}", _configuration.GetSection(buttonLanguage).GetSection("Button1").Value, true, CultureInfo.CurrentCulture)
+                .Replace("{Button2Text}", _configuration.GetSection(buttonLanguage).GetSection("Button2").Value, true, CultureInfo.CurrentCulture)
+                .Replace("{Button3Text}", _configuration.GetSection(buttonLanguage).GetSection("Button3").Value, true, CultureInfo.CurrentCulture)
+                .Replace("{Button4Text}", _configuration.GetSection(buttonLanguage).GetSection("Button4").Value, true, CultureInfo.CurrentCulture);
+
+            return new Attachment()
+            {
+                ContentType = "application/vnd.microsoft.card.adaptive",
+                Content = JsonConvert.DeserializeObject(welcomeAdaptiveCard),
+            };
+        }
+
     }
 }

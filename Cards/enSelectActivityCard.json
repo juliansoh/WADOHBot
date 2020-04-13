@@ -1,0 +1,48 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Hi, I’m the DOH chatbot and I’m new. Thank you for your patience as we develop this new service. If I am not able to answer your question, or if you find a problem with my system that you’d like to report, please send an email to [DOH.information@doh.wa.gov](mailto:DOH.information@doh.wa.gov).",
+      "wrap": true
+    },
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Type your question or pick one of these most frequently asked questions.",
+          "size": "Medium",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "[Email us](mailto:DOH.information@doh.wa.gov) if I am not able to anwer your question or to report a problem with the system.",
+          "wrap": true
+        }
+      ],
+      "style": "good",
+      "bleed": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "What is Covid-19",
+      "data": "Covid-19"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Symptoms of Covid-19",
+      "data": "Symptoms of Covid-19"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "How does Covid-19 spread",
+      "data": "How does Covid-19 spread"
+    }
+  ]
+}
+
