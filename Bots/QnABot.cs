@@ -225,15 +225,6 @@ namespace Microsoft.BotBuilderSamples.Bots
             var response = MessageFactory.Attachment(languageCard);
             await turnContext.SendActivityAsync(response, cancellationToken);
         }
-        private static async Task AskMultilingualActivityCardAsync(string lang, ITurnContext turnContext, CancellationToken cancellationToken)
-        {
-            //var displayThisLanguageCard = lang + "SelectActivityCard.json";
-            //var temp = displayThisLanguageCard;
-            //var languageCard = CreateAdaptiveCardAttachment(displayThisLanguageCard);
-            var languageActivityCard = CreateAdaptiveCardAttachment("zhSelectActivityCard.json");
-            var response = MessageFactory.Attachment(languageActivityCard);
-            await turnContext.SendActivityAsync(response, cancellationToken);
-        }
 
         // Load attachment from file.
         private static Attachment CreateAdaptiveCardAttachment(string cardType)

@@ -18,7 +18,7 @@ namespace Microsoft.BotBuilderSamples.Translation
         private const string Host = "https://api.cognitive.microsofttranslator.com";
         private const string Path = "/translate?api-version=3.0";
         private const string UriParams = "&to=";
-
+        
         private static HttpClient _client = new HttpClient();
 
         private readonly string _key;

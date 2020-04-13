@@ -29,8 +29,8 @@
     },
     {
       "type": "Action.Submit",
-      "title": "什么是符号？",
-      "data": "什么是符号？"
+      "title": "有哪些症状？",
+      "data": "有哪些症状？"
     },
     {
       "type": "Action.Submit",
@@ -39,8 +39,8 @@
     },
     {
       "type": "Action.Submit",
-      "title": "科维德-19是如何传播的？",
-      "data": "科维德-19是如何传播的？"
+      "title": "华盛顿州的病例总数是多少？",
+      "data": "华盛顿州的病例总数是多少？"
     }
   ]
 }

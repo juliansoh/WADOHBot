@@ -29,8 +29,8 @@
     },
     {
       "type": "Action.Submit",
-      "title": "¿Cuáles son los symtoms?",
-      "data": "¿Cuáles son los symtoms?"
+      "title": "¿Cuáles son los síntomas?",
+      "data": "¿Cuáles son los síntomas?"
     },
     {
       "type": "Action.Submit",
