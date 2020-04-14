@@ -8,7 +8,7 @@ namespace Microsoft.BotBuilderSamples.Translation
     public class MultilingualValues
     {
         //English
-        public const string enWelcome = "";
+        public const string enWelcome = "Hi, I’m the DOH chatbot and I’m new. Thank you for your patience as we develop this new service. If I am not able to answer your question, or if you find a problem with my system that you’d like to report, please send an email to [DOH.information@doh.wa.gov](mailto:DOH.information@doh.wa.gov).";
         public const string enInstructions = "Type your message or pick a frequently asked question.";
         public const string enButton1 = "What is Covid-19?";
         public const string enButton2 = "What are the symptoms?";
@@ -28,7 +28,7 @@ namespace Microsoft.BotBuilderSamples.Translation
         public const string esNotCorrectAnswerGivenValue = "Incorrecto";
 
         //Chinese
-        public const string zhWelcome = "";
+        public const string zhWelcome = "嗨，我是DOH聊天机器人，我是新的。感谢您的耐心，因为我们开发这项新服务。如果我无法回答您的问题，或者您发现我的系统有问题，您要报告，请发送电子邮件至[DOH.information@doh.wa.gov](mailto:DOH.information@doh.wa.gov)。";
         public const string zhInstructions = "键入选择常见问题的消息。";
         public const string zhButton1 = "什么是科维德-19？";
         public const string zhButton2 = "有哪些症状？";
@@ -65,6 +65,6 @@ namespace Microsoft.BotBuilderSamples.Translation
         public const string viButton3 = "Covid-19 lây lan như thế nào?";
         public const string viButton4 = "Tổng số trường hợp trong tiểu bang Washington là gì?";
         public const string viNotCorrectAnswerGiven = "Điều này không trả lời câu hỏi của tôi.";
-        public const string viNotCorrectAnswerGivenValue = "Sai";
+        public const string viNotCorrectAnswerGivenValue = "Không";
     }
 }
