@@ -84,7 +84,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             // Extract the text from the message activity the user sent.
             var text = turnContext.Activity.Text.ToLower();
 
-            //If language change needed (and assuming it is zh for now)
+            //If language change needed
             //Check to see if response is a selection of a language
             //if(SupportedLanguages.All(text.Contains))
             bool MatchingLanguage = Array.Exists(SupportedLanguages, element => element == text);
@@ -109,11 +109,8 @@ namespace Microsoft.BotBuilderSamples.Bots
                 text = "LanguageWasChanged";
 
             }
-            //else
-                //await Dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
 
-            //Check to see if the user just responded to a feedback, said bye, or anything that we may not send to QnAMaker. If no
-            //conditions met, then assume it's a question destined for the QnAMaker channel.
+            //Check to see if the user just responded to a feedback or used special commands to trigger an action
             switch (text)
             {
                 //A language choice was selected (see above)
@@ -136,12 +133,9 @@ namespace Microsoft.BotBuilderSamples.Bots
                     //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
                     break;
 
-                case "not":
+                case "not": //Another variation of "No" (e.g. Vietnamese)
                     //Respond to the visitor that we acknowledge their "No" feedback
                     await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedbackNo), cancellationToken);
-
-                    //Uncomment the next line if you want to activate option to have customer request for follow-up via email
-                    //await SendAskForFollowUpAsync(turnContext, cancellationToken);
 
                     //Record the Question in ApplicationInsights
                     RecordNotCorrectAnswerGiven();
@@ -150,13 +144,10 @@ namespace Microsoft.BotBuilderSamples.Bots
                     //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
                     break;
 
-                case "wrong":
+                case "wrong": //Addresses Spanish that also uses No
                     //Respond to the visitor that we acknowledge their "No" feedback
                     await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedbackNo), cancellationToken);
-
-                    //Uncomment the next line if you want to activate option to have customer request for follow-up via email
-                    //await SendAskForFollowUpAsync(turnContext, cancellationToken);
-
+                    
                     //Record the Question in ApplicationInsights
                     RecordNotCorrectAnswerGiven();
 
@@ -164,7 +155,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                     //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
                     break;
 
-                case "yes":
+                case "yes": //Not used anymore because we removed the yes button since it wasn't doing anything but thanking user.
                     await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedbackYes), cancellationToken);
                     //The next line starts the conversation again with options and instructions.
                     //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
@@ -178,6 +169,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                     await turnContext.SendActivityAsync(MessageFactory.Text(Constants.SayGoodbye), cancellationToken);
                     break;
 
+                //Follow-up cases are not being used in this version
                 case "follow-up":
                     await turnContext.SendActivityAsync(MessageFactory.Text($"Follow-up requested"), cancellationToken);
                     break;
@@ -193,11 +185,7 @@ namespace Microsoft.BotBuilderSamples.Bots
                     //Capture the question that was sent to QnAMaker
                     QuestionAsked = turnContext.Activity.Text;
 
-                    if(turnContext.Activity.Text != "No")
-                        await SendAskForFeedbackAsync(turnContext, cancellationToken);
-
-                    //Ask for feedback and show card
-                    //await SendAskForFeedbackCardAsync(turnContext, cancellationToken);
+                    await SendAskForFeedbackAsync(turnContext, cancellationToken);
                     break;
             }
 
@@ -294,13 +282,14 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 Actions = new List<CardAction>()
                 {
-                    //new CardAction() { Title = "Yes", Type = ActionTypes.ImBack, Value = "Yes" },
+                    //new CardAction() { Title = "Yes", Type = ActionTypes.ImBack, Value = "Yes" },   //No need to ask for Yes. Did not do anything before
                     new CardAction() { Title = CardTitle, Type = ActionTypes.ImBack, Value = CardValue },
                 },
             };
             await turnContext.SendActivityAsync(reply, cancellationToken);
         }
 
+        // Follow-up not implemented in this version
         private static async Task SendAskForFollowUpAsync(ITurnContext turnContext, CancellationToken cancellationToken)
         {
             var reply = MessageFactory.Text("Do you want us to follow-up with you via email?");
@@ -314,31 +303,6 @@ namespace Microsoft.BotBuilderSamples.Bots
                 },
             };
             await turnContext.SendActivityAsync(reply, cancellationToken);
-        }
-
-        //Not used here (See TranslationMiddleware.cs)
-        private Attachment CreateMultilingualCard(string cardlanguage)
-        {
-            string buttonLanguage = cardlanguage + "Buttons";
-            
-            // combine path for cross platform support
-            string[] paths = { ".", "Cards", "MultilingualCardTemplate.json" };
-            string adaptiveCardTemplate = File.ReadAllText(Path.Combine(paths));
-
-            // Replace any placeholders in the WelcomeAdaptiveCard from appsetting.json
-         
-            string welcomeAdaptiveCard = adaptiveCardTemplate
-                .Replace("{Instructions}", _configuration.GetSection(buttonLanguage).GetSection("Instructions").Value, true, CultureInfo.CurrentCulture)
-                .Replace("{Button1Text}", _configuration.GetSection(buttonLanguage).GetSection("Button1").Value, true, CultureInfo.CurrentCulture)
-                .Replace("{Button2Text}", _configuration.GetSection(buttonLanguage).GetSection("Button2").Value, true, CultureInfo.CurrentCulture)
-                .Replace("{Button3Text}", _configuration.GetSection(buttonLanguage).GetSection("Button3").Value, true, CultureInfo.CurrentCulture)
-                .Replace("{Button4Text}", _configuration.GetSection(buttonLanguage).GetSection("Button4").Value, true, CultureInfo.CurrentCulture);
-
-            return new Attachment()
-            {
-                ContentType = "application/vnd.microsoft.card.adaptive",
-                Content = JsonConvert.DeserializeObject(welcomeAdaptiveCard),
-            };
         }
 
         private static string getMultilingualFeedbackValues(string lang, string Type)
