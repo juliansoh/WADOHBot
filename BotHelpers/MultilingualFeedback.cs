@@ -8,19 +8,19 @@ using Microsoft.Bot.Schema;
 using Microsoft.BotBuilderSamples.Translation;
 using Microsoft.Extensions.Configuration;
 
-namespace Microsoft.BotBuilderSamples.Bots
+namespace Microsoft.BotBuilderSamples.Translation
 {
     public class MultilingualFeedback : CardAction
     {
-        private readonly MicrosoftTranslator _translator;
+        private MicrosoftTranslator _translator;
         IConfiguration _configuration;
 
         private string _language;
-        /*public MultilingualCardAction(string language)
+        public void MultilingualCardAction(string language)
         {
             _language = language;
             //_translator = new MicrosoftTranslator(<< YOUR TRANSLATION KEY >>);
-            //_translator = new MicrosoftTranslator($"{_configuration["TranslatorTextKey"]}");
+            //_translator = new MicrosoftTranslator(IConfiguration _configuration);
         }
 
         public string cardTitle
@@ -38,6 +38,6 @@ namespace Microsoft.BotBuilderSamples.Bots
         async Task<string> getTranslatedText(string title)
         {
             return await _translator.TranslateAsync(title, _language);
-        }*/
+        }
     }
 }

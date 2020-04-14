@@ -29,6 +29,7 @@ namespace Microsoft.BotBuilderSamples.Translation
     public class TranslationMiddleware : IMiddleware
     {
         private readonly MicrosoftTranslator _translator;
+        private static string prevPrompt;
         ConversationState _conversationState;
         IConfiguration _configuration;
         static public string[] SupportedLanguages = new string[] { "en", "es", "ko", "ja", "zh", "vi" };
@@ -69,14 +70,15 @@ namespace Microsoft.BotBuilderSamples.Translation
             if (turnContext.Activity.Type == ActivityTypes.Message)
             {
                 utterance = ConvertToUtterance(turnContext);
-
                 if (IsLanguageChangeRequested(utterance))
                 {
                     //Before converting the language, first dynamically build the ActivityCard then display it
-                    await AskMultilingualActivityCardAsync(utterance, turnContext, cancellationToken);
-
+                    //await AskMultilingualActivityCardAsync(utterance, turnContext, cancellationToken);
+                    await AskDynamicMultilingualActivityCardAsync(utterance, turnContext, cancellationToken);
+                    
                     conversationData.LanguageChangeRequested = true;
                     conversationData.LanguagePreference = utterance;
+
                 }
                 else
                 {
@@ -115,8 +117,8 @@ namespace Microsoft.BotBuilderSamples.Translation
                     string userLanguage = conversationData.LanguagePreference;
                     bool shouldTranslate = userLanguage != _configuration["TranslateTo"];
 
-                // Translate messages sent to the user to user language
-                if (shouldTranslate)
+                    // Translate messages sent to the user to user language
+                    if (shouldTranslate)
                     {
                         List<Task> tasks = new List<Task>();
                         foreach (Activity currentActivity in activities.Where(a => a.Type == ActivityTypes.Message))
@@ -136,14 +138,14 @@ namespace Microsoft.BotBuilderSamples.Translation
                 turnContext.OnUpdateActivity(async (newContext, activity, nextUpdate) =>
                 {
                 // Grab the conversation data
-                var conversationStateAccessors = _conversationState.CreateProperty<ConversationData>(nameof(ConversationData));
+                    var conversationStateAccessors = _conversationState.CreateProperty<ConversationData>(nameof(ConversationData));
                     var conversationData = await conversationStateAccessors.GetAsync(turnContext, () => new ConversationData());
 
                     string userLanguage = conversationData.LanguagePreference;
                     bool shouldTranslate = userLanguage != _configuration["TranslateTo"];
-
-                // Translate messages sent to the user to user language
-                if (activity.Type == ActivityTypes.Message)
+                    
+                    // Translate messages sent to the user to user language
+                    if (activity.Type == ActivityTypes.Message)
                     {
                         if (shouldTranslate)
                         {
@@ -160,6 +162,7 @@ namespace Microsoft.BotBuilderSamples.Translation
 
         private async Task TranslateMessageActivityAsync(IMessageActivity activity, string targetLocale, CancellationToken cancellationToken = default(CancellationToken))
         {
+
             if (activity.Type == ActivityTypes.Message)
             {
                 activity.Text = await _translator.TranslateAsync(activity.Text, targetLocale);
@@ -274,6 +277,150 @@ namespace Microsoft.BotBuilderSamples.Translation
                 ContentType = "application/vnd.microsoft.card.adaptive",
                 Content = JsonConvert.DeserializeObject(adaptiveCard),
             };
+        }
+
+        private static async Task AskDynamicMultilingualActivityCardAsync(string lang, ITurnContext turnContext, CancellationToken cancellationToken)
+        {
+            //string displayThisLanguageCard = lang + "SelectActivityCard.json";
+            var languageActivityCard = CreateMultilingualCard(lang);
+            var response = MessageFactory.Attachment(languageActivityCard);
+            await turnContext.SendActivityAsync(response, cancellationToken);
+        }
+        private static Attachment CreateMultilingualCard(string cardlanguage)
+        {
+            string buttonLanguage = cardlanguage + "Buttons";
+
+            // combine path for cross platform support (Read
+            string[] paths = { ".", "Cards", "MultilingualCardTemplate.json" };
+            string adaptiveCardTemplate = File.ReadAllText(Path.Combine(paths));
+
+            //Get the right language values to use in the creation of the card (see MultilingualValues.cs in the Constants folder)
+            var Welcome = getMultilingualValues(cardlanguage, "Welcome");
+            var Instructions = getMultilingualValues(cardlanguage, "Instructions");
+            var Button1 = getMultilingualValues(cardlanguage, "Button1");
+            var Button2 = getMultilingualValues(cardlanguage, "Button2");
+            var Button3 = getMultilingualValues(cardlanguage, "Button3");
+            var Button4 = getMultilingualValues(cardlanguage, "Button4");
+
+            string welcomeAdaptiveCard = adaptiveCardTemplate
+                .Replace("{Welcome}", Welcome, true, CultureInfo.CurrentCulture)
+                .Replace("{Instructions}", Instructions, true, CultureInfo.CurrentCulture)
+                .Replace("{Button1Text}", Button1, true, CultureInfo.CurrentCulture)
+                .Replace("{Button1Data}", Button1, true, CultureInfo.CurrentCulture)
+                .Replace("{Button2Text}", Button2, true, CultureInfo.CurrentCulture)
+                .Replace("{Button2Data}", Button2, true, CultureInfo.CurrentCulture)
+                .Replace("{Button3Text}", Button3, true, CultureInfo.CurrentCulture)
+                .Replace("{Button3Data}", Button3, true, CultureInfo.CurrentCulture)
+                .Replace("{Button4Text}", Button4, true, CultureInfo.CurrentCulture)
+                .Replace("{Button4Data}", Button4, true, CultureInfo.CurrentCulture);
+
+
+            return new Attachment()
+            {
+                ContentType = "application/vnd.microsoft.card.adaptive",
+                Content = JsonConvert.DeserializeObject(welcomeAdaptiveCard),
+            };
+        }
+        private static string getMultilingualValues(string lang, string type)
+        {
+            string result = "";
+
+            switch(lang)
+            {
+                case "es":
+                    if (type == "Welcome")
+                        result = MultilingualValues.esWelcome;
+                    if (type == "Instructions")
+                        result = MultilingualValues.esInstructions;
+                    if (type == "Button1")
+                        result = MultilingualValues.esButton1;
+                    if (type == "Button2")
+                        result = MultilingualValues.esButton2;
+                    if (type == "Button3")
+                        result = MultilingualValues.esButton3;
+                    if (type == "Button4")
+                        result = MultilingualValues.esButton4;
+                    break;
+
+                case "zh":
+                    if (type == "Welcome")
+                        result = MultilingualValues.zhWelcome;
+                    if (type == "Instructions")
+                        result = MultilingualValues.zhInstructions;
+                    if (type == "Button1")
+                        result = MultilingualValues.zhButton1;
+                    if (type == "Button2")
+                        result = MultilingualValues.zhButton2;
+                    if (type == "Button3")
+                        result = MultilingualValues.zhButton3;
+                    if (type == "Button4")
+                        result = MultilingualValues.zhButton4;
+                    break;
+
+                case "vi":
+                    if (type == "Welcome")
+                        result = MultilingualValues.viWelcome;
+                    if (type == "Instructions")
+                        result = MultilingualValues.viInstructions;
+                    if (type == "Button1")
+                        result = MultilingualValues.viButton1;
+                    if (type == "Button2")
+                        result = MultilingualValues.viButton2;
+                    if (type == "Button3")
+                        result = MultilingualValues.viButton3;
+                    if (type == "Button4")
+                        result = MultilingualValues.viButton4;
+                    break;
+
+                case "ko":
+                    if (type == "Welcome")
+                        result = MultilingualValues.koWelcome;
+                    if (type == "Instructions")
+                        result = MultilingualValues.koInstructions;
+                    if (type == "Button1")
+                        result = MultilingualValues.koButton1;
+                    if (type == "Button2")
+                        result = MultilingualValues.koButton2;
+                    if (type == "Button3")
+                        result = MultilingualValues.koButton3;
+                    if (type == "Button4")
+                        result = MultilingualValues.koButton4;
+                    break;
+
+                case "ja":
+                    if (type == "Welcome")
+                        result = MultilingualValues.jaWelcome;
+                    if (type == "Instructions")
+                        result = MultilingualValues.jaInstructions;
+                    if (type == "Button1")
+                        result = MultilingualValues.jaButton1;
+                    if (type == "Button2")
+                        result = MultilingualValues.jaButton2;
+                    if (type == "Button3")
+                        result = MultilingualValues.jaButton3;
+                    if (type == "Button4")
+                        result = MultilingualValues.jaButton4;
+                    break;
+
+                case "en":
+                    if (type == "Welcome")
+                        result = MultilingualValues.enWelcome;
+                    if (type == "Instructions")
+                        result = MultilingualValues.enInstructions;
+                    if (type == "Button1")
+                        result = MultilingualValues.enButton1;
+                    if (type == "Button2")
+                        result = MultilingualValues.enButton2;
+                    if (type == "Button3")
+                        result = MultilingualValues.enButton3;
+                    if (type == "Button4")
+                        result = MultilingualValues.enButton4;
+                    break;
+            }
+            return result;
+
+
+
         }
 
     }

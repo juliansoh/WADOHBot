@@ -8,6 +8,11 @@
       "items": [
         {
           "type": "TextBlock",
+          "text": "{Welcome}",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
           "text": "{Instructions}",
           "wrap": true
         }
@@ -30,7 +35,7 @@
     {
       "type": "Action.Submit",
       "title": "{Button3Text}",
-      "data": "{Button2Data}"
+      "data": "{Button3Data}"
     },
     {
       "type": "Action.Submit",

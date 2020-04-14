@@ -30,7 +30,6 @@
       <Folder Include="Model\" />
       <Folder Include="Translation\Model\" />
       <Folder Include="Utility\" />
-      <Folder Include="Resources\" />
     </ItemGroup>
 
   <Import Project="PostDeployScripts\IncludeSources.targets" Condition="Exists('PostDeployScripts\IncludeSources.targets')" />

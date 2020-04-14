@@ -36,6 +36,8 @@ namespace Microsoft.BotBuilderSamples.Bots
         static public string[] SupportedLanguages = new string[] { "en", "es", "ko", "ja", "zh", "vi" };
         public static string QuestionAsked;
         public static string Email;
+        public static string _currentLang;
+        
         //public string AnswerProvided;
         
         public QnABot(ConversationState conversationState, UserState userState, T dialog, IConfiguration configuration)
@@ -90,6 +92,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             {
                 //That means var text contains a language code "en", "es", "ja", "vi" or "zh"
                 string language = utterance;
+                _currentLang = text; //Store current language in _currentLang for use until it changes again.
                 var fullWelcomePrompt = _configuration["WelcomeCardTitle"] + ". " + _configuration["WelcomePrompt"];
                 //string detection_re_welcomeMessage = $"{_configuration["LanguageTransitionPrompt"]}\r\n\r\n{fullWelcomePrompt}\r\n\r\n{_configuration["QuestionSegue"]}";
                 string detection_re_welcomeMessage = $"{_configuration["LanguageTransitionPrompt"]}\r\n\r\n{Constants.WelcomeMessage}";
@@ -127,10 +130,35 @@ namespace Microsoft.BotBuilderSamples.Bots
                     //await SendAskForFollowUpAsync(turnContext, cancellationToken);
 
                     //Record the Question in ApplicationInsights
-                    var properties = new Dictionary<string, string>
-                    { {"Question",QuestionAsked}, {"Email",Email }};
-                    TelemetryClient client = new TelemetryClient();
-                    client.TrackEvent("NotCorrectAnswerGiven", properties);
+                    RecordNotCorrectAnswerGiven();
+
+                    //The next line starts the conversation again with options and instructions.
+                    //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
+                    break;
+
+                case "not":
+                    //Respond to the visitor that we acknowledge their "No" feedback
+                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedbackNo), cancellationToken);
+
+                    //Uncomment the next line if you want to activate option to have customer request for follow-up via email
+                    //await SendAskForFollowUpAsync(turnContext, cancellationToken);
+
+                    //Record the Question in ApplicationInsights
+                    RecordNotCorrectAnswerGiven();
+
+                    //The next line starts the conversation again with options and instructions.
+                    //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
+                    break;
+
+                case "wrong":
+                    //Respond to the visitor that we acknowledge their "No" feedback
+                    await turnContext.SendActivityAsync(MessageFactory.Text(Constants.AckFeedbackNo), cancellationToken);
+
+                    //Uncomment the next line if you want to activate option to have customer request for follow-up via email
+                    //await SendAskForFollowUpAsync(turnContext, cancellationToken);
+
+                    //Record the Question in ApplicationInsights
+                    RecordNotCorrectAnswerGiven();
 
                     //The next line starts the conversation again with options and instructions.
                     //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
@@ -164,10 +192,25 @@ namespace Microsoft.BotBuilderSamples.Bots
                     await Dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
                     //Capture the question that was sent to QnAMaker
                     QuestionAsked = turnContext.Activity.Text;
-                    await SendAskForFeedbackAsync(turnContext, cancellationToken);
+
+                    if(turnContext.Activity.Text != "No")
+                        await SendAskForFeedbackAsync(turnContext, cancellationToken);
+
+                    //Ask for feedback and show card
+                    //await SendAskForFeedbackCardAsync(turnContext, cancellationToken);
                     break;
             }
 
+        }
+
+        private void RecordNotCorrectAnswerGiven()
+        {
+            //Record the Question in ApplicationInsights
+            var properties = new Dictionary<string, string>
+                    { {"Question",QuestionAsked}, {"Email",Email }};
+            TelemetryClient client = new TelemetryClient();
+            client.TrackEvent("NotCorrectAnswerGiven", properties);
+            return;
         }
 
         private string ConvertToUtterance(ITurnContext<IMessageActivity> turnContext)
@@ -244,13 +287,15 @@ namespace Microsoft.BotBuilderSamples.Bots
         private static async Task SendAskForFeedbackAsync(ITurnContext turnContext, CancellationToken cancellationToken)
         {
             var reply = MessageFactory.Text("Did this answer your question?");
+            var CardTitle = getMultilingualFeedbackValues(_currentLang,"Title");
+            var CardValue = getMultilingualFeedbackValues(_currentLang, "Value");
 
             reply.SuggestedActions = new SuggestedActions()
             {
                 Actions = new List<CardAction>()
                 {
-                    new CardAction() { Title = "Yes", Type = ActionTypes.ImBack, Value = "Yes" },
-                    new CardAction() { Title = "No", Type = ActionTypes.ImBack, Value = "No" },
+                    //new CardAction() { Title = "Yes", Type = ActionTypes.ImBack, Value = "Yes" },
+                    new CardAction() { Title = CardTitle, Type = ActionTypes.ImBack, Value = CardValue },
                 },
             };
             await turnContext.SendActivityAsync(reply, cancellationToken);
@@ -271,6 +316,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             await turnContext.SendActivityAsync(reply, cancellationToken);
         }
 
+        //Not used here (See TranslationMiddleware.cs)
         private Attachment CreateMultilingualCard(string cardlanguage)
         {
             string buttonLanguage = cardlanguage + "Buttons";
@@ -293,6 +339,58 @@ namespace Microsoft.BotBuilderSamples.Bots
                 ContentType = "application/vnd.microsoft.card.adaptive",
                 Content = JsonConvert.DeserializeObject(welcomeAdaptiveCard),
             };
+        }
+
+        private static string getMultilingualFeedbackValues(string lang, string Type)
+        {
+            string result = "";
+
+            switch (lang)
+            {
+                case "es":
+                    if(Type == "Title")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.esNotCorrectAnswerGiven;
+                    if(Type == "Value")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.esNotCorrectAnswerGivenValue;
+                    break;
+
+                case "zh":
+                    if(Type == "Title")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.zhNotCorrectAnswerGiven;
+                    if (Type == "Value")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.zhNotCorrectAnswerGivenValue;
+                    break;
+
+                case "vi":
+                    if (Type == "Title")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.viNotCorrectAnswerGiven;
+                    if (Type == "Value")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.viNotCorrectAnswerGivenValue;
+                    break;
+
+                case "ko":
+                    if (Type == "Title")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.koNotCorrectAnswerGiven;
+                    if (Type == "Value")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.koNotCorrectAnswerGivenValue;
+                    break;
+
+                case "ja":
+                    if (Type == "Title")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.jaNotCorrectAnswerGiven;
+                    if (Type == "Value")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.jaNotCorrectAnswerGivenValue;
+                    break;
+
+                case "en":
+                    if (Type == "Title")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.enNotCorrectAnswerGiven;
+                    if (Type == "Value")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.enNotCorrectAnswerGivenValue;
+                    break;
+            }
+            return result;
+
         }
 
     }
