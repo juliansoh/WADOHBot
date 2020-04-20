@@ -34,5 +34,6 @@
 
   <Import Project="PostDeployScripts\IncludeSources.targets" Condition="Exists('PostDeployScripts\IncludeSources.targets')" />
   <Import Project="..\PostDeployScripts\IncludeSources.targets" Condition="Exists('..\PostDeployScripts\IncludeSources.targets')" />
+  <ProjectExtensions><VisualStudio><UserProperties cards_4selectlanguagecard_1json__JsonSchema="{" /></VisualStudio></ProjectExtensions>
 
 </Project>
