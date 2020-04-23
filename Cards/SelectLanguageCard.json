@@ -29,9 +29,9 @@
       "items": [
         {
           "type": "Input.ChoiceSet",
-          "id": "SingleSelectVal",
+          "id": "choiceset",
           "style": "expanded",
-          "value": "1",
+          "value": "en",
           "choices": [
             {
               "title": "English",
@@ -83,7 +83,7 @@
       "type": "Action.Submit",
       "title": "Submit",
       "data": {
-        "id": "1234567890"
+        "action": "languageselector"
       }
     }
   ]

@@ -55,6 +55,7 @@ namespace Microsoft.BotBuilderSamples.Bots
             // Save any state changes that might have occured during the turn.
             await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
             await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
+
         }
 
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
@@ -65,11 +66,17 @@ namespace Microsoft.BotBuilderSamples.Bots
                 {
                     //Commenting out Welcome Message in lieu of selecting language first, then showing Welcome Message in user's native language.
                     //await turnContext.SendActivityAsync(MessageFactory.Text(Constants.WelcomeMessage), cancellationToken);
-                    
+
                     //Ask for preferred language
                     await AskPreferredLanguageCardAsync(turnContext, cancellationToken);
                     //Send Suggested actions
                     //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
+
+                    // Language selector
+
+
+                  
+
                 }
             }
         }
