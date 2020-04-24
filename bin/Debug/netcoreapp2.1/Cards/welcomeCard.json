@@ -1,0 +1,43 @@
+{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "body": [
+    {
+      "type": "Container",
+      "items": [
+        {
+          "type": "TextBlock",
+          "text": "Type your question or pick one of these most frequently asked questions.",
+          "size": "Medium",
+          "wrap": true
+        },
+        {
+          "type": "TextBlock",
+          "text": "[Email us](mailto:DOH.information@doh.wa.gov) if I am not able to anwer your question or to report a problem with the system.",
+          "wrap": true
+        }
+      ],
+      "style": "good",
+      "bleed": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "What is Covid-19",
+      "data": "Covid-19"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Symptoms of Covid-19",
+      "data": "Symptoms of Covid-19"
+    },
+    {
+      "type": "Action.Submit",
+      "title": "How does Covid-19 spread",
+      "data": "How does Covid-19 spread"
+    }
+  ]
+}
+  
