@@ -5,76 +5,66 @@
   "body": [
     {
       "type": "Container",
+      "bleed": true,
+      "style": "accent",
       "items": [
         {
           "type": "TextBlock",
-          "text": "Washington State Department of Health",
           "size": "Medium",
-          "wrap": true,
-          "horizontalAlignment": "Center",
-          "weight": "Bolder"
-        },
-        {
-          "type": "TextBlock",
-          "text": "Please select your language preferance & click Submit:",
-          "wrap": true,
+          "weight": "Bolder",
+          "text": "Washington State Department of Health",
           "horizontalAlignment": "Center"
         }
-      ],
-      "style": "good",
-      "bleed": true
+      ]
     },
     {
-      "type": "Container",
-      "items": [
+      "type": "TextBlock",
+      "text": "Please select language preference:",
+      "horizontalAlignment": "Center"
+    },
+    {
+      "type": "Input.ChoiceSet",
+      "id": "choiceset",
+      "style": "expanded",
+      "value": "en",
+      "choices": [
         {
-          "type": "Input.ChoiceSet",
-          "id": "choiceset",
-          "style": "expanded",
-          "value": "en",
-          "choices": [
-            {
-              "title": "English",
-              "value": "en"
-            },
-            {
-              "title": "中文 - Mandarin",
-              "value": "zh"
-            },
-            {
-              "title": "日本語 - Japanese",
-              "value": "ja"
-            },
-            {
-              "title": "한국어 - Korean",
-              "value": "ko"
-            },
-            {
-              "title": "Việt - Vietnamese",
-              "value": "vi"
-            },
-            {
-              "title": "Español - Spanish",
-              "value": "es"
-            },
-            {
-              "title": "ਪੰਜਾਬੀ - Punjabi",
-              "value": "pa"
-            },
-            {
-              "title": "русский - Russian",
-              "value": "ru"
-            },
-            {
-              "title": "Українські - Ukranian",
-              "value": "uk"
-            },
-            {
-              "title": "हिंदी - Hindi",
-              "value": "hi"
-            }
-          ]
+          "title": "English",
+          "value": "en"
+        },
+        {
+          "title": "中文 - Chinese",
+          "value": "zh"
+        },
+        {
+          "title": "日本語 - Japanese",
+          "value": "ja"
+        },
+        {
+          "title": "한국어 - Korean",
+          "value": "ko"
+        },
+        {
+          "title": "ਪੰਜਾਬੀ - Punjabi",
+          "value": "pa"
+        },
+        {
+          "title": "русский - Russian",
+          "value": "ru"
+        },
+        {
+          "title": "Español - Spanish",
+          "value": "es"
+        },
+        {
+          "title": "українська - Ukrainian",
+          "value": "uk"
+        },
+        {
+          "title": "Việt - Vietnamese",
+          "value": "vi"
         }
+
       ]
     }
   ],
