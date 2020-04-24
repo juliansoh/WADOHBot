@@ -87,7 +87,8 @@ namespace Microsoft.BotBuilderSamples.Bots
                         //Record the Question in ApplicationInsights
                         var properties = new Dictionary<string, string>
                     { {"Question",QuestionAsked}, {"Email",Email }};
-                        TelemetryClient client = new TelemetryClient();
+                        var client = new TelemetryClient();
+                        client.InstrumentationKey = _configuration.GetSection("ApplicationInsights").GetSection("NotCorrectAnswerInstrumentationKey").Value;
                         client.TrackEvent("NotCorrectAnswerGiven", properties);
 
                         //The next line starts the conversation again with options and instructions.
