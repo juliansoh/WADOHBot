@@ -33,7 +33,7 @@ namespace Microsoft.BotBuilderSamples.Bots
         protected readonly Microsoft.Bot.Builder.Dialogs.Dialog Dialog;
         protected readonly BotState _userState;
         IConfiguration _configuration;
-        static public string[] SupportedLanguages = new string[] { "en", "es", "ko", "ja", "zh", "vi" };
+        static public string[] SupportedLanguages = new string[] { "en", "zh", "ja", "ko", "pa", "ru", "es", "uk", "vi" };
         public static string QuestionAsked;
         public static string Email;
         public static string _currentLang;
@@ -72,10 +72,6 @@ namespace Microsoft.BotBuilderSamples.Bots
                     //Send Suggested actions
                     //await SendSuggestedActionsCardAsync(turnContext, cancellationToken);
 
-                    // Language selector
-
-
-                  
 
                 }
             }
@@ -203,7 +199,8 @@ namespace Microsoft.BotBuilderSamples.Bots
             //Record the Question in ApplicationInsights
             var properties = new Dictionary<string, string>
                     { {"Question",QuestionAsked}, {"Email",Email }};
-            TelemetryClient client = new TelemetryClient();
+            var client = new TelemetryClient();
+            client.InstrumentationKey = _configuration.GetSection("ApplicationInsights").GetSection("NotCorrectAnswerInstrumentationKey").Value;
             client.TrackEvent("NotCorrectAnswerGiven", properties);
             return;
         }
@@ -358,6 +355,27 @@ namespace Microsoft.BotBuilderSamples.Bots
                         result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.enNotCorrectAnswerGiven;
                     if (Type == "Value")
                         result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.enNotCorrectAnswerGivenValue;
+                    break;
+
+                case "pa":
+                    if (Type == "Title")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.paNotCorrectAnswerGiven;
+                    if (Type == "Value")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.paNotCorrectAnswerGivenValue;
+                    break;
+
+                case "ru":
+                    if (Type == "Title")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.ruNotCorrectAnswerGiven;
+                    if (Type == "Value")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.ruNotCorrectAnswerGivenValue;
+                    break;
+
+                case "uk":
+                    if (Type == "Title")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.ukNotCorrectAnswerGiven;
+                    if (Type == "Value")
+                        result = Microsoft.BotBuilderSamples.Translation.MultilingualValues.ukNotCorrectAnswerGivenValue;
                     break;
             }
             return result;

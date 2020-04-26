@@ -66,5 +66,36 @@ namespace Microsoft.BotBuilderSamples.Translation
         public const string viButton4 = "Tổng số trường hợp trong tiểu bang Washington là gì?";
         public const string viNotCorrectAnswerGiven = "Điều này không trả lời câu hỏi của tôi.";
         public const string viNotCorrectAnswerGivenValue = "Không";
+
+        //Punjabi
+        public const string paWelcome = "ਹੈਲੋ, ਮੈਂ DOH ਚੈਟਬੋਟ ਹਾਂ ਅਤੇ ਮੈਂ ਨਵਾਂ ਹਾਂ। ਜਦ ਅਸੀਂ ਇਸ ਨਵੀਂ ਸੇਵਾ ਦਾ ਵਿਕਾਸ ਕਰਦੇ ਹਾਂ ਤਾਂ ਤੁਹਾਡੇ ਸਬਰ ਵਾਸਤੇ ਤੁਹਾਡਾ ਧੰਨਵਾਦ। ਜੇ ਮੈਂ ਤੁਹਾਡੇ ਸਵਾਲ ਦਾ ਜਵਾਬ ਦੇਣ ਦੇ ਯੋਗ ਨਹੀਂ ਹਾਂ, ਜਾਂ ਜੇ ਤੁਹਾਨੂੰ ਮੇਰੇ ਸਿਸਟਮ ਵਿੱਚ ਕੋਈ ਸਮੱਸਿਆ ਹੈ ਜਿਸਦੀ ਤੁਸੀਂ ਰਿਪੋਰਟ ਕਰਨੀ ਚਾਹੁੰਦੇ ਹੋ, ਤਾਂ ਕਿਰਪਾ ਕਰਕੇ [DOH.information@doh.wa.gov](mailto:DOH.information@doh.wa.gov) 'ਤੇ ਇੱਕ ਈਮੇਲ ਭੇਜੋ।";
+        public const string paInstructions = "ਆਪਣਾ ਸੁਨੇਹਾ ਟਾਈਪ ਕਰੋ ਜਾਂ ਬਾਰ ਬਾਰ ਪੁੱਛੇ ਗਏ ਸਵਾਲ ਨੂੰ ਚੁਣੋ।";
+        public const string paButton1 = "ਕੋਵਿਡ-19 ਕੀ ਹੈ?";
+        public const string paButton2 = "ਲੱਛਣ ਕੀ ਹਨ?";
+        public const string paButton3 = "ਕੋਵਿਡ-19 ਕਿਵੇਂ ਫੈਲਦਾ ਹੈ?";
+        public const string paButton4 = "ਵਾਸ਼ਿੰਗਟਨ ਪ੍ਰਾਂਤ ਵਿੱਚ ਕੁੱਲ ਮਾਮਲੇ ਕੀ ਹਨ?";
+        public const string paNotCorrectAnswerGiven = "ਇਸ ਨੇ ਮੇਰੇ ਸਵਾਲ ਦਾ ਜਵਾਬ ਨਹੀਂ ਦਿੱਤਾ।";
+        public const string paNotCorrectAnswerGivenValue = "ਨਹੀਂ";
+
+        //Russian
+        public const string ruWelcome = "Привет, я DOH чат-бот, и я новичок. Спасибо за ваше терпение, как мы разрабатываем эту новую услугу. Если я не могу ответить на ваш вопрос, или если вы обнаружите проблемы с моей системой, что вы хотели бы сообщить, пожалуйста, отправьте по электронной почте на [DOH.information@doh.wa.gov](mailto:DOH.information@doh.wa.gov).";
+        public const string ruInstructions = "Введите сообщение или выберите часто задаваемый вопрос.";
+        public const string ruButton1 = "Что такое Ковид-19?";
+        public const string ruButton2 = "Каковы симптомы?";
+        public const string ruButton3 = "Яким Covid-19 Спред?";
+        public const string ruButton4 = "Каковы общие случаи заболевания в штате Вашингтон?";
+        public const string ruNotCorrectAnswerGiven = "Это не ответило на мой вопрос.";
+        public const string ruNotCorrectAnswerGivenValue = "Нет";
+
+        //Ukrainian
+        public const string ukWelcome = "Привіт, я DOH чат-ботів, і я новачок. Дякуємо вам за терпіння, як ми розвиваємо цю нову послугу. Якщо я не можу відповісти на ваше запитання, або якщо ви знайдете проблеми з моєю системою, яку ви хотіли б повідомити, будь ласка, надішліть листа на [DOH.information@doh.wa.gov](mailto:DOH.information@doh.wa.gov).";
+        public const string ukInstructions = "Введіть своє повідомлення або виберіть запитання, яке часто задаються.";
+        public const string ukButton1 = "Що таке Covid-19?";
+        public const string ukButton2 = "Які симптоми?";
+        public const string ukButton3 = "Яким Covid-19 Спред?";
+        public const string ukButton4 = "Які загальні випадки в штаті Вашингтон?";
+        public const string ukNotCorrectAnswerGiven = "Це не відповіли на моє запитання.";
+        public const string ukNotCorrectAnswerGivenValue = "Неправильно";
+
     }
 }

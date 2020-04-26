@@ -16,6 +16,7 @@ using Microsoft.Bot.Schema;
 using Microsoft.BotBuilderSamples.Dialog;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using QnABot.Model;
 
 
@@ -29,10 +30,9 @@ namespace Microsoft.BotBuilderSamples.Translation
     public class TranslationMiddleware : IMiddleware
     {
         private readonly MicrosoftTranslator _translator;
-        private static string prevPrompt;
         ConversationState _conversationState;
         IConfiguration _configuration;
-        static public string[] SupportedLanguages = new string[] { "en", "es", "ko", "ja", "zh", "vi" };
+        static public string[] SupportedLanguages = new string[] { "en", "zh", "ja", "ko", "pa", "ru", "es", "uk", "vi" };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TranslationMiddleware"/> class.
@@ -70,6 +70,7 @@ namespace Microsoft.BotBuilderSamples.Translation
             if (turnContext.Activity.Type == ActivityTypes.Message)
             {
                 utterance = ConvertToUtterance(turnContext);
+                
                 if (IsLanguageChangeRequested(utterance))
                 {
                     //Before converting the language, first dynamically build the ActivityCard then display it
@@ -249,6 +250,13 @@ namespace Microsoft.BotBuilderSamples.Translation
                 // If postback is a language choice then grab that choice
                 if (tokens.Count() == 2 && tokens[0].Trim() == "LanguagePreference")
                     turnContext.Activity.Text = utterance = tokens[1].Trim();
+
+                // If postback is a language choice FROM the Radio buttons in Adaptive Cards
+                if (tokens.Count() == 3 && tokens[0].Trim() == "action")
+                {
+                    if(tokens[1].Trim().Substring(0, 16) == "languageselector")
+                        turnContext.Activity.Text = utterance = tokens[2].Trim();
+                }
             }
             else
             {
@@ -258,13 +266,13 @@ namespace Microsoft.BotBuilderSamples.Translation
             return utterance;
         }
 
-        private static async Task AskMultilingualActivityCardAsync(string lang, ITurnContext turnContext, CancellationToken cancellationToken)
-        {
-            string displayThisLanguageCard = lang + "SelectActivityCard.json";
-            var languageActivityCard = CreateAdaptiveCardAttachment(displayThisLanguageCard);
-            var response = MessageFactory.Attachment(languageActivityCard);
-            await turnContext.SendActivityAsync(response, cancellationToken);
-        }
+        //private static async Task AskMultilingualActivityCardAsync(string lang, ITurnContext turnContext, CancellationToken cancellationToken)
+        //{
+        //    string displayThisLanguageCard = lang + "SelectActivityCard.json";
+        //    var languageActivityCard = CreateAdaptiveCardAttachment(displayThisLanguageCard);
+        //    var response = MessageFactory.Attachment(languageActivityCard);
+        //    await turnContext.SendActivityAsync(response, cancellationToken);
+        //}
 
         private static Attachment CreateAdaptiveCardAttachment(string cardType)
         {
@@ -415,6 +423,51 @@ namespace Microsoft.BotBuilderSamples.Translation
                         result = MultilingualValues.enButton3;
                     if (type == "Button4")
                         result = MultilingualValues.enButton4;
+                    break;
+
+                case "ru":
+                    if (type == "Welcome")
+                        result = MultilingualValues.ruWelcome;
+                    if (type == "Instructions")
+                        result = MultilingualValues.ruInstructions;
+                    if (type == "Button1")
+                        result = MultilingualValues.ruButton1;
+                    if (type == "Button2")
+                        result = MultilingualValues.ruButton2;
+                    if (type == "Button3")
+                        result = MultilingualValues.ruButton3;
+                    if (type == "Button4")
+                        result = MultilingualValues.ruButton4;
+                    break;
+
+                case "pa":
+                    if (type == "Welcome")
+                        result = MultilingualValues.paWelcome;
+                    if (type == "Instructions")
+                        result = MultilingualValues.paInstructions;
+                    if (type == "Button1")
+                        result = MultilingualValues.paButton1;
+                    if (type == "Button2")
+                        result = MultilingualValues.paButton2;
+                    if (type == "Button3")
+                        result = MultilingualValues.paButton3;
+                    if (type == "Button4")
+                        result = MultilingualValues.paButton4;
+                    break;
+
+                case "uk":
+                    if (type == "Welcome")
+                        result = MultilingualValues.ukWelcome;
+                    if (type == "Instructions")
+                        result = MultilingualValues.ukInstructions;
+                    if (type == "Button1")
+                        result = MultilingualValues.ukButton1;
+                    if (type == "Button2")
+                        result = MultilingualValues.ukButton2;
+                    if (type == "Button3")
+                        result = MultilingualValues.ukButton3;
+                    if (type == "Button4")
+                        result = MultilingualValues.ukButton4;
                     break;
             }
             return result;

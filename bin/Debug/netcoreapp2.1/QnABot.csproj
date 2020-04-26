@@ -28,6 +28,7 @@
 
     <ItemGroup>
       <Folder Include="Model\" />
+      <Folder Include="Properties\PublishProfiles\" />
       <Folder Include="Translation\Model\" />
       <Folder Include="Utility\" />
     </ItemGroup>
